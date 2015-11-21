@@ -4,3 +4,4 @@ extern crate lfsr;
 mod support;
 
 mod test_lfsr;
+mod test_synthesis;
