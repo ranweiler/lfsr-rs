@@ -6,3 +6,6 @@ authors = ["Joe Ranweiler <josephkennethranweiler@gmail.com>"]
 [dependencies]
 bit-vec = "0.4"
 num = "0.1"
+
+[[test]]
+name = "all"
