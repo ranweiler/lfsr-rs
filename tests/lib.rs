@@ -1,4 +1,5 @@
-#[cfg(test)]
+extern crate lfsr;
+
 mod support;
 
 macro_rules! iter_works_for {
@@ -16,7 +17,6 @@ macro_rules! iter_works_for {
     }}
 }
 
-#[test]
 macro_rules! primitive_connection_polynomial_yields_a_maximum_sequence {
     ($subject:ident) => {{
         let taps = vec![4, 5, 6, 8];
@@ -35,14 +35,14 @@ macro_rules! primitive_connection_polynomial_yields_a_maximum_sequence {
 
 #[test]
 fn iter_works_for_fibonacci() {
-    use ::lfsr::fibonacci::LFSR;
+    use lfsr::lfsr::fibonacci::LFSR;
 
     iter_works_for!(LFSR);
 }
 
 #[test]
 fn iter_works_for_galois() {
-    use ::lfsr::galois::LFSR;
+    use lfsr::lfsr::galois::LFSR;
 
     iter_works_for!(LFSR);
 }
@@ -53,10 +53,10 @@ fn same_connection_polynomial_produce_output_equal_mod_rotation() {
 
     let taps = vec![2, 3];
 
-    let mut galois = ::lfsr::galois::LFSR::from_iter(taps.iter());
+    let mut galois = lfsr::lfsr::galois::LFSR::from_iter(taps.iter());
     let galois_output: Vec<bool> = galois.iter().take(7).collect();
 
-    let mut fibonacci = ::lfsr::fibonacci::LFSR::from_iter(taps.iter());
+    let mut fibonacci = lfsr::lfsr::fibonacci::LFSR::from_iter(taps.iter());
     let fibonacci_output: Vec<bool> = fibonacci.iter().take(7).collect();
 
     assert!(eq_mod_rotation(&fibonacci_output, &galois_output));
@@ -64,14 +64,14 @@ fn same_connection_polynomial_produce_output_equal_mod_rotation() {
 
 #[test]
 fn primitive_connection_polynomial_yields_a_maximum_sequence_for_fibonacci() {
-    use ::lfsr::fibonacci::LFSR;
+    use lfsr::lfsr::fibonacci::LFSR;
 
     primitive_connection_polynomial_yields_a_maximum_sequence!(LFSR);
 }
 
 #[test]
 fn primitive_connection_polynomial_yields_a_maximum_sequence_for_galois() {
-    use ::lfsr::galois::LFSR;
+    use lfsr::lfsr::galois::LFSR;
 
     primitive_connection_polynomial_yields_a_maximum_sequence!(LFSR);
 }
