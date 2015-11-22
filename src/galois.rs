@@ -27,8 +27,6 @@ impl GaloisLFSR {
         GaloisLFSR { state: state, mask: mask, }
     }
 
-
-
     fn shift(&mut self) {
         lfsr::shift(&mut self.state);
     }
