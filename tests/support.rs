@@ -9,7 +9,7 @@ macro_rules! iter_works_for {
 
         let expected = vec![true, false, false, true, false, true, true, true];
 
-        assert!(support::eq_mod_rotation(&output, &expected));
+        assert!($crate::support::eq_mod_rotation(&output, &expected));
     }}
 }
 
@@ -29,7 +29,7 @@ macro_rules! primitive_connection_polynomial_yields_a_maximum_sequence {
     }}
 }
 
-pub fn eq_mod_rotation<T: PartialEq>(&ref left: &Vec<T>, &ref right: &Vec<T>) -> bool {
+pub fn eq_mod_rotation<T: PartialEq>(left: &Vec<T>, right: &Vec<T>) -> bool {
     if left.len() != right.len() { return false }
 
     let len = left.len();
