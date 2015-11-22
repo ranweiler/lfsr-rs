@@ -17,7 +17,7 @@ mod test {
     use super::shift;
 
     #[test]
-    fn it_works() {
+    fn shift_works() {
         let ref mut bv = BitVec::from_elem(4, true);
 
         shift(bv);
