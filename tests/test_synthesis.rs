@@ -3,13 +3,13 @@ use lfsr::lfsr::galois::LFSR;
 use support::eq_mod_rotation;
 
 #[test]
-fn berlekamp_massey_works() {
+fn berlekamp_massey_kat() {
     let seq = vec![true, false, false, true, false, true, true, true];
-    let expected_conn_poly = vec![2, 3];
+    let expected_taps = vec![2, 3];
 
     let result = berlekamp_massey(seq.iter());
 
-    assert_eq!(result, expected_conn_poly);
+    assert_eq!(result, expected_taps);
 
     let mut result_lfsr = LFSR::from_iter(result.iter());
 

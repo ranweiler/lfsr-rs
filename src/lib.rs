@@ -3,3 +3,4 @@ extern crate num;
 
 pub mod lfsr;
 pub mod synthesis;
+mod bin_poly;
