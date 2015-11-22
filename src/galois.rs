@@ -1,6 +1,7 @@
 use bit_vec::BitVec;
 use num::pow;
 use std::slice::Iter;
+use lfsr;
 
 #[derive(PartialEq, Debug)]
 pub struct LFSR {
@@ -42,14 +43,7 @@ impl LFSR {
     }
 
     fn shift(&mut self) {
-        let len = self.state.len();
-
-        for i in (1 .. len).rev() {
-            let pred = self.state[i - 1];
-            self.state.set(i, pred);
-        };
-
-        self.state.set(0, false);
+        lfsr::shift(&mut self.state);
     }
 
     fn feedback(&mut self) {
