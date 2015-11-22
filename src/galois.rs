@@ -27,20 +27,7 @@ impl GaloisLFSR {
         GaloisLFSR { state: state, mask: mask, }
     }
 
-    pub fn output(&self) -> bool {
-        let len = self.state.len();
-        self.state[len - 1]
-    }
 
-    pub fn step(&mut self) {
-        let output = self.output();
-
-        self.shift();
-
-        if output {
-            self.feedback();
-        }
-    }
 
     fn shift(&mut self) {
         lfsr::shift(&mut self.state);
@@ -74,6 +61,23 @@ impl GaloisLFSR {
     }
 }
 
+impl lfsr::LFSR for GaloisLFSR {
+    fn output(&self) -> bool {
+        let len = self.state.len();
+        self.state[len - 1]
+    }
+
+    fn step(&mut self) {
+        let output = self.output();
+
+        self.shift();
+
+        if output {
+            self.feedback();
+        }
+    }
+}
+
 pub struct LFSRIter<'a> {
     lfsr: &'a mut GaloisLFSR,
 }
@@ -82,6 +86,8 @@ impl<'a> Iterator for LFSRIter<'a> {
     type Item = bool;
 
     fn next(&mut self) -> Option<bool> {
+        use lfsr::LFSR;
+
         let o = self.lfsr.output();
         self.lfsr.step();
         Some(o)
@@ -96,6 +102,8 @@ impl<'a> Iterator for LFSRByteIter<'a> {
     type Item = u8;
 
     fn next(&mut self) -> Option<u8> {
+        use lfsr::LFSR;
+
         let byte = self.lfsr.lsbyte();
         self.lfsr.step();
         Some(byte)
