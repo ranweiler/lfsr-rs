@@ -1,4 +1,3 @@
-use bit_vec;
 use bit_vec::BitVec;
 use num::pow;
 use std::slice::Iter;
@@ -13,7 +12,7 @@ impl LFSR {
     pub fn from_iter(iter: Iter<usize>) -> Self {
         let &len = iter.clone().max().unwrap();
 
-        let state = bit_vec::BitVec::from_elem(len, true);
+        let state = BitVec::from_elem(len, true);
 
         let mut taps: Vec<usize> = iter.map(|&t| t).collect();
         taps.sort();
