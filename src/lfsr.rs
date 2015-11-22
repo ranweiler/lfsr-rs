@@ -1,5 +1,10 @@
 use bit_vec::BitVec;
 
+pub trait LFSR {
+    fn output(&self) -> bool;
+    fn step(&mut self);
+}
+
 pub fn shift(state: &mut BitVec) {
     let range = 1 .. state.len();
 
