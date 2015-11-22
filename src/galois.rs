@@ -4,12 +4,12 @@ use std::slice::Iter;
 use lfsr;
 
 #[derive(PartialEq, Debug)]
-pub struct LFSR {
+pub struct GaloisLFSR {
     state: BitVec,
     mask: BitVec,
 }
 
-impl LFSR {
+impl GaloisLFSR {
     pub fn from_iter(iter: Iter<usize>) -> Self {
         let &len = iter.clone().max().unwrap();
 
@@ -24,7 +24,7 @@ impl LFSR {
         }
         mask.set(0, true);
 
-        LFSR { state: state, mask: mask, }
+        GaloisLFSR { state: state, mask: mask, }
     }
 
     pub fn output(&self) -> bool {
@@ -75,7 +75,7 @@ impl LFSR {
 }
 
 pub struct LFSRIter<'a> {
-    lfsr: &'a mut LFSR,
+    lfsr: &'a mut GaloisLFSR,
 }
 
 impl<'a> Iterator for LFSRIter<'a> {
@@ -89,7 +89,7 @@ impl<'a> Iterator for LFSRIter<'a> {
 }
 
 pub struct LFSRByteIter<'a> {
-    lfsr: &'a mut LFSR,
+    lfsr: &'a mut GaloisLFSR,
 }
 
 impl<'a> Iterator for LFSRByteIter<'a> {

@@ -4,12 +4,12 @@ use std::slice::Iter;
 use lfsr;
 
 #[derive(PartialEq, Debug)]
-pub struct LFSR {
+pub struct FibonacciLFSR {
     state: BitVec,
     taps: Vec<usize>,
 }
 
-impl LFSR {
+impl FibonacciLFSR {
     pub fn from_iter(iter: Iter<usize>) -> Self {
         let &len = iter.clone().max().unwrap();
 
@@ -19,7 +19,7 @@ impl LFSR {
         taps.sort();
         taps.dedup();
 
-        LFSR { state: state, taps: taps, }
+        FibonacciLFSR { state: state, taps: taps, }
     }
 
     pub fn output(&self) -> bool {
@@ -68,7 +68,7 @@ impl LFSR {
 }
 
 pub struct LFSRIter<'a> {
-    lfsr: &'a mut LFSR,
+    lfsr: &'a mut FibonacciLFSR,
 }
 
 impl<'a> Iterator for LFSRIter<'a> {
@@ -82,7 +82,7 @@ impl<'a> Iterator for LFSRIter<'a> {
 }
 
 pub struct LFSRByteIter<'a> {
-    lfsr: &'a mut LFSR,
+    lfsr: &'a mut FibonacciLFSR,
 }
 
 impl<'a> Iterator for LFSRByteIter<'a> {
