@@ -1,5 +1,5 @@
-use lfsr::lfsr::fibonacci::LFSR as FibonacciLFSR;
-use lfsr::lfsr::galois::LFSR as GaloisLFSR;
+use lfsr::fibonacci::LFSR as FibonacciLFSR;
+use lfsr::galois::LFSR as GaloisLFSR;
 
 use support::eq_mod_rotation;
 

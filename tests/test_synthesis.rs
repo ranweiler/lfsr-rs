@@ -1,5 +1,5 @@
 use lfsr::synthesis::berlekamp_massey;
-use lfsr::lfsr::galois::LFSR;
+use lfsr::galois::LFSR;
 use support::eq_mod_rotation;
 
 #[test]
