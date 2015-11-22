@@ -22,19 +22,6 @@ impl FibonacciLFSR {
         FibonacciLFSR { state: state, taps: taps, }
     }
 
-    pub fn output(&self) -> bool {
-        let len = self.state.len();
-        self.state[len - 1]
-    }
-
-    pub fn step(&mut self) {
-        let b = self.feedback_bit();
-
-        self.shift();
-
-        self.state.set(0, b);
-    }
-
     fn shift(&mut self) {
         lfsr::shift(&mut self.state);
     }
@@ -67,6 +54,21 @@ impl FibonacciLFSR {
     }
 }
 
+impl lfsr::LFSR for FibonacciLFSR {
+    fn output(&self) -> bool {
+        let len = self.state.len();
+        self.state[len - 1]
+    }
+
+    fn step(&mut self) {
+        let b = self.feedback_bit();
+
+        self.shift();
+
+        self.state.set(0, b);
+    }
+}
+
 pub struct LFSRIter<'a> {
     lfsr: &'a mut FibonacciLFSR,
 }
@@ -75,6 +77,7 @@ impl<'a> Iterator for LFSRIter<'a> {
     type Item = bool;
 
     fn next(&mut self) -> Option<bool> {
+        use lfsr::LFSR;
         let r = self.lfsr.state.get(0);
         self.lfsr.step();
         r
@@ -89,6 +92,7 @@ impl<'a> Iterator for LFSRByteIter<'a> {
     type Item = u8;
 
     fn next(&mut self) -> Option<u8> {
+        use lfsr::LFSR;
         let byte = self.lfsr.lsbyte();
         self.lfsr.step();
         Some(byte)
