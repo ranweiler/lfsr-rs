@@ -1,5 +1,4 @@
 use bit_vec::BitVec;
-use num::pow;
 use std::slice::Iter;
 use lfsr;
 
@@ -41,22 +40,6 @@ impl GaloisLFSR {
     pub fn iter(&mut self) -> LFSRIter {
         LFSRIter { lfsr: self }
     }
-
-    fn lsbyte(&self) -> u8 {
-        self.state
-            .iter()
-            .take(8)
-            .enumerate()
-            .fold(0, |acc, (i, b)| acc + (b as u8) * pow(2, i))
-    }
-
-    pub fn bytes(&mut self) -> LFSRByteIter {
-        if self.state.len() < 8 {
-            panic!("LFSR must have length at least 8 to iterate bytes");
-        }
-
-        LFSRByteIter { lfsr: self }
-    }
 }
 
 impl lfsr::LFSR for GaloisLFSR {
@@ -89,21 +72,5 @@ impl<'a> Iterator for LFSRIter<'a> {
         let o = self.lfsr.output();
         self.lfsr.step();
         Some(o)
-    }
-}
-
-pub struct LFSRByteIter<'a> {
-    lfsr: &'a mut GaloisLFSR,
-}
-
-impl<'a> Iterator for LFSRByteIter<'a> {
-    type Item = u8;
-
-    fn next(&mut self) -> Option<u8> {
-        use lfsr::LFSR;
-
-        let byte = self.lfsr.lsbyte();
-        self.lfsr.step();
-        Some(byte)
     }
 }
