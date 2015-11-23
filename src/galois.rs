@@ -37,8 +37,8 @@ impl GaloisLFSR {
         }
     }
 
-    pub fn iter(&mut self) -> LFSRIter {
-        LFSRIter { lfsr: self }
+    pub fn iter(&mut self) -> lfsr::LFSRIter<GaloisLFSR> {
+        lfsr::LFSRIter { lfsr: self }
     }
 }
 
@@ -56,21 +56,5 @@ impl lfsr::LFSR for GaloisLFSR {
         if output {
             self.feedback();
         }
-    }
-}
-
-pub struct LFSRIter<'a> {
-    lfsr: &'a mut GaloisLFSR,
-}
-
-impl<'a> Iterator for LFSRIter<'a> {
-    type Item = bool;
-
-    fn next(&mut self) -> Option<bool> {
-        use lfsr::LFSR;
-
-        let o = self.lfsr.output();
-        self.lfsr.step();
-        Some(o)
     }
 }

@@ -16,6 +16,22 @@ pub fn shift(state: &mut BitVec) {
     state.set(0, false);
 }
 
+pub struct LFSRIter<'a, T: 'a + LFSR> {
+    pub lfsr: &'a mut T,
+}
+
+impl<'a, T: LFSR> Iterator for LFSRIter<'a, T> {
+    type Item = bool;
+
+    fn next(&mut self) -> Option<bool> {
+        use lfsr::LFSR;
+
+        let o = self.lfsr.output();
+        self.lfsr.step();
+        Some(o)
+    }
+}
+
 #[cfg(test)]
 mod test {
     use bit_vec::BitVec;

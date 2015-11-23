@@ -32,8 +32,8 @@ impl FibonacciLFSR {
             .fold(false, |acc, b| acc ^ b)
     }
 
-    pub fn iter(&mut self) -> LFSRIter {
-        LFSRIter { lfsr: self }
+    pub fn iter(&mut self) -> lfsr::LFSRIter<FibonacciLFSR> {
+        lfsr::LFSRIter { lfsr: self }
     }
 }
 
@@ -49,20 +49,5 @@ impl lfsr::LFSR for FibonacciLFSR {
         self.shift();
 
         self.state.set(0, b);
-    }
-}
-
-pub struct LFSRIter<'a> {
-    lfsr: &'a mut FibonacciLFSR,
-}
-
-impl<'a> Iterator for LFSRIter<'a> {
-    type Item = bool;
-
-    fn next(&mut self) -> Option<bool> {
-        use lfsr::LFSR;
-        let r = self.lfsr.state.get(0);
-        self.lfsr.step();
-        r
     }
 }
