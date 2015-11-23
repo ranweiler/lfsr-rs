@@ -1,104 +1,53 @@
-use bit_vec;
 use bit_vec::BitVec;
-use num::pow;
 use std::slice::Iter;
+use lfsr;
 
 #[derive(PartialEq, Debug)]
-pub struct LFSR {
+pub struct FibonacciLFSR {
     state: BitVec,
     taps: Vec<usize>,
 }
 
-impl LFSR {
+impl FibonacciLFSR {
     pub fn from_iter(iter: Iter<usize>) -> Self {
         let &len = iter.clone().max().unwrap();
 
-        let state = bit_vec::BitVec::from_elem(len, true);
+        let state = BitVec::from_elem(len, true);
 
         let mut taps: Vec<usize> = iter.map(|&t| t).collect();
         taps.sort();
         taps.dedup();
 
-        LFSR { state: state, taps: taps, }
-    }
-
-    pub fn output(&self) -> bool {
-        let len = self.state.len();
-        self.state[len - 1]
-    }
-
-    pub fn step(&mut self) {
-        let b = self.feedback_bit();
-
-        self.shift();
-
-        self.state.set(0, b);
+        FibonacciLFSR { state: state, taps: taps, }
     }
 
     fn shift(&mut self) {
-        let len = self.state.len();
-
-        let range = 1 .. len;
-        for i in range.rev() {
-            let pred = self.state[i-1];
-            self.state.set(i, pred);
-        };
-
-        self.state.set(0, false);
+        lfsr::shift(&mut self.state);
     }
 
     fn feedback_bit(&mut self) -> bool {
         self.taps
             .iter()
-            .map(|&i| self.state[i-1])
+            .map(|&i| self.state[i - 1])
             .fold(false, |acc, b| acc ^ b)
     }
 
-    pub fn iter(&mut self) -> LFSRIter {
-        LFSRIter { lfsr: self }
-    }
-
-    fn lsbyte(&self) -> u8 {
-        self.state
-            .iter()
-            .take(8)
-            .enumerate()
-            .fold(0, |acc, (i, b)| acc + (b as u8) * pow(2, i))
-    }
-
-    pub fn bytes(&mut self) -> LFSRByteIter {
-        if self.state.len() < 8 {
-            panic!("LFSR must have length at least 8 to iterate bytes");
-        }
-
-        LFSRByteIter { lfsr: self }
+    pub fn iter(&mut self) -> lfsr::LFSRIter<FibonacciLFSR> {
+        lfsr::LFSRIter { lfsr: self }
     }
 }
 
-pub struct LFSRIter<'a> {
-    lfsr: &'a mut LFSR,
-}
-
-impl<'a> Iterator for LFSRIter<'a> {
-    type Item = bool;
-
-    fn next(&mut self) -> Option<bool> {
-        let r = self.lfsr.state.get(0);
-        self.lfsr.step();
-        r
+impl lfsr::LFSR for FibonacciLFSR {
+    fn output(&self) -> bool {
+        let len = self.state.len();
+        self.state[len - 1]
     }
-}
 
-pub struct LFSRByteIter<'a> {
-    lfsr: &'a mut LFSR,
-}
+    fn step(&mut self) {
+        let b = self.feedback_bit();
 
-impl<'a> Iterator for LFSRByteIter<'a> {
-    type Item = u8;
+        self.shift();
 
-    fn next(&mut self) -> Option<u8> {
-        let byte = self.lfsr.lsbyte();
-        self.lfsr.step();
-        Some(byte)
+        self.state.set(0, b);
     }
 }

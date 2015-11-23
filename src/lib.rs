@@ -6,3 +6,4 @@ pub mod galois;
 pub mod synthesis;
 
 mod bin_poly;
+mod lfsr;

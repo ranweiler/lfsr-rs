@@ -19,13 +19,14 @@ macro_rules! primitive_connection_polynomial_yields_a_maximum_sequence {
 
         let mut lfsr = $subject::from_iter(taps.iter());
 
-        let bytes = lfsr.bytes();
+        let output: Vec<bool> = lfsr
+            .iter()
+            .take(255)
+            .collect();
 
-        let mut result: Vec<u8> = bytes.take(1024).collect();
-        result.sort();
-        result.dedup();
-
-        assert_eq!(result.len(), 255);
+        for i in 1 .. 255 {
+            assert!(!$crate::support::has_period(&output, i));
+        }
     }}
 }
 
@@ -44,9 +45,15 @@ pub fn eq_mod_rotation<T: PartialEq>(left: &Vec<T>, right: &Vec<T>) -> bool {
     false
 }
 
+pub fn has_period<T: PartialEq>(seq: &Vec<T>, n: usize) -> bool {
+    let m = seq.len();
+
+    (0 .. m).all(|i| seq[i] == seq[(i + n) % m])
+}
+
 #[cfg(test)]
 mod test {
-    use super::eq_mod_rotation;
+    use super::{eq_mod_rotation, has_period};
 
     #[test]
     fn eq_mod_rotation_works() {
@@ -75,5 +82,20 @@ mod test {
         assert!(!eq_mod_rotation(&v1, &w));
         assert!(!eq_mod_rotation(&v2, &w));
         assert!(!eq_mod_rotation(&v3, &w));
+    }
+
+    #[test]
+    fn has_period_works() {
+        let v_period_2 = vec![0, 1, 0, 1, 0, 1, 0, 1];
+        let v_period_3 = vec![0, 1, 2, 0, 1, 2];
+
+        let v_no_period = vec![0, 1, 0, 1, 0, 0];
+
+        assert!(has_period(&v_period_2, 2));
+        assert!(has_period(&v_period_3, 3));
+
+        for i in 1 .. v_no_period.len() {
+            assert!(!has_period(&v_no_period, i));
+        }
     }
 }

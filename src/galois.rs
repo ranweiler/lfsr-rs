@@ -1,14 +1,14 @@
 use bit_vec::BitVec;
-use num::pow;
 use std::slice::Iter;
+use lfsr;
 
 #[derive(PartialEq, Debug)]
-pub struct LFSR {
+pub struct GaloisLFSR {
     state: BitVec,
     mask: BitVec,
 }
 
-impl LFSR {
+impl GaloisLFSR {
     pub fn from_iter(iter: Iter<usize>) -> Self {
         let &len = iter.clone().max().unwrap();
 
@@ -23,33 +23,11 @@ impl LFSR {
         }
         mask.set(0, true);
 
-        LFSR { state: state, mask: mask, }
-    }
-
-    pub fn output(&self) -> bool {
-        let len = self.state.len();
-        self.state[len - 1]
-    }
-
-    pub fn step(&mut self) {
-        let output = self.output();
-
-        self.shift();
-
-        if output {
-            self.feedback();
-        }
+        GaloisLFSR { state: state, mask: mask, }
     }
 
     fn shift(&mut self) {
-        let len = self.state.len();
-
-        for i in (1 .. len).rev() {
-            let pred = self.state[i - 1];
-            self.state.set(i, pred);
-        };
-
-        self.state.set(0, false);
+        lfsr::shift(&mut self.state);
     }
 
     fn feedback(&mut self) {
@@ -59,51 +37,24 @@ impl LFSR {
         }
     }
 
-    pub fn iter(&mut self) -> LFSRIter {
-        LFSRIter { lfsr: self }
+    pub fn iter(&mut self) -> lfsr::LFSRIter<GaloisLFSR> {
+        lfsr::LFSRIter { lfsr: self }
+    }
+}
+
+impl lfsr::LFSR for GaloisLFSR {
+    fn output(&self) -> bool {
+        let len = self.state.len();
+        self.state[len - 1]
     }
 
-    fn lsbyte(&self) -> u8 {
-        self.state
-            .iter()
-            .take(8)
-            .enumerate()
-            .fold(0, |acc, (i, b)| acc + (b as u8) * pow(2, i))
-    }
+    fn step(&mut self) {
+        let output = self.output();
 
-    pub fn bytes(&mut self) -> LFSRByteIter {
-        if self.state.len() < 8 {
-            panic!("LFSR must have length at least 8 to iterate bytes");
+        self.shift();
+
+        if output {
+            self.feedback();
         }
-
-        LFSRByteIter { lfsr: self }
-    }
-}
-
-pub struct LFSRIter<'a> {
-    lfsr: &'a mut LFSR,
-}
-
-impl<'a> Iterator for LFSRIter<'a> {
-    type Item = bool;
-
-    fn next(&mut self) -> Option<bool> {
-        let o = self.lfsr.output();
-        self.lfsr.step();
-        Some(o)
-    }
-}
-
-pub struct LFSRByteIter<'a> {
-    lfsr: &'a mut LFSR,
-}
-
-impl<'a> Iterator for LFSRByteIter<'a> {
-    type Item = u8;
-
-    fn next(&mut self) -> Option<u8> {
-        let byte = self.lfsr.lsbyte();
-        self.lfsr.step();
-        Some(byte)
     }
 }
