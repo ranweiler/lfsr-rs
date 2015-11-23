@@ -28,7 +28,7 @@ impl FibonacciLFSR {
     fn feedback_bit(&mut self) -> bool {
         self.taps
             .iter()
-            .map(|&i| self.state[i-1])
+            .map(|&i| self.state[i - 1])
             .fold(false, |acc, b| acc ^ b)
     }
 
