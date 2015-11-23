@@ -44,9 +44,15 @@ pub fn eq_mod_rotation<T: PartialEq>(left: &Vec<T>, right: &Vec<T>) -> bool {
     false
 }
 
+pub fn has_period<T: PartialEq>(seq: &Vec<T>, n: usize) -> bool {
+    let m = seq.len();
+
+    (0 .. m).all(|i| seq[i] == seq[(i + n) % m])
+}
+
 #[cfg(test)]
 mod test {
-    use super::eq_mod_rotation;
+    use super::{eq_mod_rotation, has_period};
 
     #[test]
     fn eq_mod_rotation_works() {
@@ -75,5 +81,20 @@ mod test {
         assert!(!eq_mod_rotation(&v1, &w));
         assert!(!eq_mod_rotation(&v2, &w));
         assert!(!eq_mod_rotation(&v3, &w));
+    }
+
+    #[test]
+    fn has_period_works() {
+        let v_period_2 = vec![0, 1, 0, 1, 0, 1, 0, 1];
+        let v_period_3 = vec![0, 1, 2, 0, 1, 2];
+
+        let v_no_period = vec![0, 1, 0, 1, 0, 0];
+
+        assert!(has_period(&v_period_2, 2));
+        assert!(has_period(&v_period_3, 3));
+
+        for i in 1 .. v_no_period.len() {
+            assert!(!has_period(&v_no_period, i));
+        }
     }
 }
