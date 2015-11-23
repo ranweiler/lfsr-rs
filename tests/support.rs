@@ -19,13 +19,14 @@ macro_rules! primitive_connection_polynomial_yields_a_maximum_sequence {
 
         let mut lfsr = $subject::from_iter(taps.iter());
 
-        let bytes = lfsr.bytes();
+        let output: Vec<bool> = lfsr
+            .iter()
+            .take(255)
+            .collect();
 
-        let mut result: Vec<u8> = bytes.take(1024).collect();
-        result.sort();
-        result.dedup();
-
-        assert_eq!(result.len(), 255);
+        for i in 1 .. 255 {
+            assert!(!$crate::support::has_period(&output, i));
+        }
     }}
 }
 
