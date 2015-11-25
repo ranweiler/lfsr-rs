@@ -59,6 +59,7 @@ impl LFSR for GaloisLFSR {
         }
     }
 }
+
 impl IntoIterator for GaloisLFSR {
     type Item = bool;
     type IntoIter = lfsr::IntoIter<GaloisLFSR>;
