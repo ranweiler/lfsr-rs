@@ -79,3 +79,47 @@ fn implements_into_iterator_for_mut_refs_for_galois() {
 
     lfsr.step();
 }
+
+#[test]
+fn implements_iter_for_fibonacci() {
+    let taps = vec![2, 3];
+    let mut lfsr = FibonacciLFSR::from_iter(taps.iter());
+
+    let output: Vec<bool> = lfsr.iter().take(8).collect();
+
+    let expected = vec![true, false, false, true, false, true, true, true];
+
+    assert!(eq_mod_rotation(&output, &expected))
+}
+
+#[test]
+fn implements_into_iterator_for_fibonacci() {
+    let taps = vec![2, 3];
+    let lfsr = FibonacciLFSR::from_iter(taps.iter());
+
+    let mut counter = 0;
+    for _b in lfsr {
+        if counter == 3 {
+            break;
+        }
+        counter += 1;
+    }
+}
+
+#[test]
+fn implements_into_iterator_for_mut_refs_for_fibonacci() {
+    use lfsr::LFSR;
+
+    let taps = vec![2, 3];
+    let mut lfsr = FibonacciLFSR::from_iter(taps.iter());
+
+    let mut counter = 0;
+    for _b in &mut lfsr {
+        if counter == 3 {
+            break;
+        }
+        counter += 1;
+    }
+
+    lfsr.step();
+}
