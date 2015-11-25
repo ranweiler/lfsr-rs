@@ -35,3 +35,47 @@ fn primitive_connection_polynomial_yields_a_maximum_sequence_for_fibonacci() {
 fn primitive_connection_polynomial_yields_a_maximum_sequence_for_galois() {
     primitive_connection_polynomial_yields_a_maximum_sequence!(GaloisLFSR);
 }
+
+#[test]
+fn implements_iter() {
+    let taps = vec![2, 3];
+    let mut lfsr = GaloisLFSR::from_iter(taps.iter());
+
+    let output: Vec<bool> = lfsr.iter().take(8).collect();
+
+    let expected = vec![true, false, false, true, false, true, true, true];
+
+    assert!(eq_mod_rotation(&output, &expected))
+}
+
+#[test]
+fn implements_into_iterator() {
+    let taps = vec![2, 3];
+    let lfsr = GaloisLFSR::from_iter(taps.iter());
+
+    let mut counter = 0;
+    for _b in lfsr {
+        if counter == 3 {
+            break;
+        }
+        counter += 1;
+    }
+}
+
+#[test]
+fn implements_into_iterator_for_mut_refs() {
+    use lfsr::LFSR;
+
+    let taps = vec![2, 3];
+    let mut lfsr = GaloisLFSR::from_iter(taps.iter());
+
+    let mut counter = 0;
+    for _b in &mut lfsr {
+        if counter == 3 {
+            break;
+        }
+        counter += 1;
+    }
+
+    lfsr.step();
+}
