@@ -16,18 +16,34 @@ pub fn shift(state: &mut BitVec) {
     state.set(0, false);
 }
 
-pub struct LFSRIter<'a, T: 'a + LFSR> {
+pub struct Iter<'a, T: 'a + LFSR> {
     pub lfsr: &'a mut T,
 }
 
-impl<'a, T: LFSR> Iterator for LFSRIter<'a, T> {
+impl<'a, T: LFSR> Iterator for Iter<'a, T> {
     type Item = bool;
 
     fn next(&mut self) -> Option<bool> {
-        use lfsr::LFSR;
-
         let o = self.lfsr.output();
+
         self.lfsr.step();
+
+        Some(o)
+    }
+}
+
+pub struct IntoIter<L: LFSR> {
+    pub lfsr: L,
+}
+
+impl<T: LFSR> Iterator for IntoIter<T> {
+    type Item = bool;
+
+    fn next(&mut self) -> Option<bool> {
+        let o = self.lfsr.output();
+
+        self.lfsr.step();
+
         Some(o)
     }
 }

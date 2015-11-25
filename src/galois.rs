@@ -1,5 +1,6 @@
 use bit_vec::BitVec;
 use std::slice::Iter;
+use std::iter::FromIterator;
 use lfsr;
 
 #[derive(PartialEq, Debug)]
@@ -9,23 +10,6 @@ pub struct GaloisLFSR {
 }
 
 impl GaloisLFSR {
-    pub fn from_iter(iter: Iter<usize>) -> Self {
-        let &len = iter.clone().max().unwrap();
-
-        let state = BitVec::from_elem(len, true);
-        let mut mask = BitVec::from_elem(len, false);
-
-        for &t in iter {
-            if t < len {
-                // Set the _counterpart_ mask index
-                mask.set(len - t, true);
-            }
-        }
-        mask.set(0, true);
-
-        GaloisLFSR { state: state, mask: mask, }
-    }
-
     fn shift(&mut self) {
         lfsr::shift(&mut self.state);
     }
@@ -37,8 +21,8 @@ impl GaloisLFSR {
         }
     }
 
-    pub fn iter(&mut self) -> lfsr::LFSRIter<GaloisLFSR> {
-        lfsr::LFSRIter { lfsr: self }
+    pub fn iter(&mut self) -> lfsr::Iter<GaloisLFSR> {
+        lfsr::Iter { lfsr: self }
     }
 }
 
@@ -56,5 +40,46 @@ impl lfsr::LFSR for GaloisLFSR {
         if output {
             self.feedback();
         }
+    }
+}
+
+impl IntoIterator for GaloisLFSR {
+    type Item = bool;
+    type IntoIter = lfsr::IntoIter<GaloisLFSR>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        lfsr::IntoIter { lfsr: self }
+    }
+}
+
+impl<'a> IntoIterator for &'a mut GaloisLFSR {
+    type Item = bool;
+    type IntoIter = lfsr::Iter<'a, GaloisLFSR>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        lfsr::Iter { lfsr: self }
+    }
+}
+
+impl FromIterator<usize> for GaloisLFSR {
+    fn from_iter<T>(source: T) -> Self where T: IntoIterator<Item=usize> {
+        let mut taps: Vec<usize> = source.into_iter().map(|t| t).collect();
+        taps.sort();
+        taps.dedup();
+
+        let &len = taps.iter().max().unwrap();
+
+        let state = BitVec::from_elem(len, true);
+        let mut mask = BitVec::from_elem(len, false);
+
+        for &t in &taps {
+            if t < len {
+                // Set the _counterpart_ mask index
+                mask.set(len - t, true);
+            }
+        }
+        mask.set(0, true);
+
+        GaloisLFSR { state: state, mask: mask, }
     }
 }

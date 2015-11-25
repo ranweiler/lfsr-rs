@@ -1,5 +1,6 @@
 use bit_vec::BitVec;
 use std::slice::Iter;
+use std::iter::FromIterator;
 use lfsr;
 
 #[derive(PartialEq, Debug)]
@@ -9,18 +10,6 @@ pub struct FibonacciLFSR {
 }
 
 impl FibonacciLFSR {
-    pub fn from_iter(iter: Iter<usize>) -> Self {
-        let &len = iter.clone().max().unwrap();
-
-        let state = BitVec::from_elem(len, true);
-
-        let mut taps: Vec<usize> = iter.map(|&t| t).collect();
-        taps.sort();
-        taps.dedup();
-
-        FibonacciLFSR { state: state, taps: taps, }
-    }
-
     fn shift(&mut self) {
         lfsr::shift(&mut self.state);
     }
@@ -32,8 +21,8 @@ impl FibonacciLFSR {
             .fold(false, |acc, b| acc ^ b)
     }
 
-    pub fn iter(&mut self) -> lfsr::LFSRIter<FibonacciLFSR> {
-        lfsr::LFSRIter { lfsr: self }
+    pub fn iter(&mut self) -> lfsr::Iter<FibonacciLFSR> {
+        lfsr::Iter { lfsr: self }
     }
 }
 
@@ -49,5 +38,36 @@ impl lfsr::LFSR for FibonacciLFSR {
         self.shift();
 
         self.state.set(0, b);
+    }
+}
+
+impl IntoIterator for FibonacciLFSR {
+    type Item = bool;
+    type IntoIter = lfsr::IntoIter<FibonacciLFSR>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        lfsr::IntoIter { lfsr: self }
+    }
+}
+
+impl<'a> IntoIterator for &'a mut FibonacciLFSR {
+    type Item = bool;
+    type IntoIter = lfsr::Iter<'a, FibonacciLFSR>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        lfsr::Iter { lfsr: self }
+    }
+}
+
+impl FromIterator<usize> for FibonacciLFSR {
+    fn from_iter<T>(source: T) -> Self where T: IntoIterator<Item=usize> {
+        let mut taps: Vec<usize> = source.into_iter().map(|t| t).collect();
+        taps.sort();
+        taps.dedup();
+
+        let &len = taps.iter().max().unwrap();
+        let state = BitVec::from_elem(len, true);
+
+        FibonacciLFSR { state: state, taps: taps, }
     }
 }
