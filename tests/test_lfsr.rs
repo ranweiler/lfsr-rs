@@ -37,7 +37,7 @@ fn primitive_connection_polynomial_yields_a_maximum_sequence_for_galois() {
 }
 
 #[test]
-fn implements_iter() {
+fn implements_iter_for_galois() {
     let taps = vec![2, 3];
     let mut lfsr = GaloisLFSR::from_iter(taps.iter());
 
@@ -49,7 +49,7 @@ fn implements_iter() {
 }
 
 #[test]
-fn implements_into_iterator() {
+fn implements_into_iterator_for_galois() {
     let taps = vec![2, 3];
     let lfsr = GaloisLFSR::from_iter(taps.iter());
 
@@ -63,7 +63,7 @@ fn implements_into_iterator() {
 }
 
 #[test]
-fn implements_into_iterator_for_mut_refs() {
+fn implements_into_iterator_for_mut_refs_for_galois() {
     use lfsr::LFSR;
 
     let taps = vec![2, 3];
