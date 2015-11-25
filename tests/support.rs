@@ -1,7 +1,7 @@
 macro_rules! iter_works_for {
     ($subject:ident) => {{
         let taps = vec![2, 3];
-        let mut lfsr = $subject::from_iter(taps.iter());
+        let mut lfsr: $subject = taps.iter().cloned().collect();
 
         let iter = lfsr.iter();
 
@@ -16,8 +16,7 @@ macro_rules! iter_works_for {
 macro_rules! primitive_connection_polynomial_yields_a_maximum_sequence {
     ($subject:ident) => {{
         let taps = vec![4, 5, 6, 8];
-
-        let mut lfsr = $subject::from_iter(taps.iter());
+        let mut lfsr: $subject = taps.iter().cloned().collect();
 
         let output: Vec<bool> = lfsr
             .iter()

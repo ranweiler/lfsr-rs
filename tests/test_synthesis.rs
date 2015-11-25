@@ -11,7 +11,7 @@ fn berlekamp_massey_kat() {
 
     assert_eq!(result, expected_taps);
 
-    let mut result_lfsr = LFSR::from_iter(result.iter());
+    let mut result_lfsr: LFSR = result.iter().cloned().collect();
 
     let result_output: Vec<bool> = result_lfsr.iter().take(8).collect();
 
