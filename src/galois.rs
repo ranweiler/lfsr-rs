@@ -1,7 +1,6 @@
 use bit_vec::BitVec;
 use std::slice::Iter;
 use lfsr;
-use lfsr::LFSR;
 
 #[derive(PartialEq, Debug)]
 pub struct GaloisLFSR {
@@ -43,7 +42,7 @@ impl GaloisLFSR {
     }
 }
 
-impl LFSR for GaloisLFSR {
+impl lfsr::LFSR for GaloisLFSR {
     fn output(&self) -> bool {
         let len = self.state.len();
         self.state[len - 1]
